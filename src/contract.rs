@@ -1,4 +1,4 @@
-use cosmwasm_std::{Addr, Response, StdResult};
+use cosmwasm_std::{Addr, Response, StdResult, ensure, Storage};
 use cw_storage_plus::Item;
 use sylvia::types::{ExecCtx, InstantiateCtx, QueryCtx};
 use sylvia::{contract, entry_points};
@@ -63,5 +63,19 @@ impl CounterContract<'_> {
         }
         self.count.save(ctx.deps.storage, &(count - 1))?;
         Ok(Response::default())
+    }
+
+    #[msg(exec)]
+    pub fn reset_counter(&self, ctx: ExecCtx) -> Result<Response, ContractError> {
+        let storage: &mut dyn Storage = ctx.deps.storage;
+        ensure!(self.is_admin(storage, &ctx.info.sender), ContractError::NotAnAdmin(ctx.info.sender));
+        self.count.save(storage, &0)?;
+        Ok(Response::default())
+    }
+
+    fn is_admin(&self, storage: &mut dyn Storage, address: &Addr) -> bool  {
+        // basically fail if unable to load state... be on the safe side
+        let admins: Vec<Addr> = self.admins.load(storage).unwrap_or(vec![]);
+        match admins.binary_search(address) { Ok(_) => true, _ => false }
     }
 }

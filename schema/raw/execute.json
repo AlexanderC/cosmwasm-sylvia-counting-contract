@@ -35,6 +35,18 @@
             }
           },
           "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "reset_counter"
+          ],
+          "properties": {
+            "reset_counter": {
+              "type": "object"
+            }
+          },
+          "additionalProperties": false
         }
       ]
     },
