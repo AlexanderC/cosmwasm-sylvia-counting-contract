@@ -6,10 +6,37 @@
       "$ref": "#/definitions/WhitelistQueryMsg"
     },
     {
+      "$ref": "#/definitions/IbcQueryMsg"
+    },
+    {
       "$ref": "#/definitions/QueryMsg"
     }
   ],
   "definitions": {
+    "IbcQueryMsg": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "ibc_count"
+          ],
+          "properties": {
+            "ibc_count": {
+              "type": "object",
+              "required": [
+                "channel"
+              ],
+              "properties": {
+                "channel": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
     "QueryMsg": {
       "oneOf": [
         {

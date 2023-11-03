@@ -1,18 +1,16 @@
 use cosmwasm_std::{ensure, Addr, Response, StdResult, Storage};
-// use cosmwasm_std::{
-//     IbcChannelCloseMsg, IbcChannelConnectMsg,
-//     IbcChannelOpenMsg, IbcPacketAckMsg,
-//     IbcPacketReceiveMsg, IbcPacketTimeoutMsg
-// };
 use cw2::set_contract_version;
-use cw_storage_plus::Item;
-use sylvia::types::{ExecCtx, InstantiateCtx, QueryCtx};
+use cw_storage_plus::{Item, Map};
 use sylvia::contract;
 #[cfg(not(feature = "library"))]
 use sylvia::entry_points;
+use sylvia::types::{ExecCtx, InstantiateCtx, QueryCtx};
 
 use crate::error::*;
 use crate::responses::*;
+
+// Note the "--channel-version" use when running hermes or similar relayer
+pub const IBC_VERSION: &str = "counter-contract-1";
 
 const CONTRACT_NAME: &str = "crates.io:counting-contract";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -21,6 +19,8 @@ pub struct CounterContract<'a> {
     pub(crate) count: Item<'a, u32>,
     pub(crate) owner: Item<'a, Addr>,
     pub(crate) admins: Item<'a, Vec<Addr>>,
+    pub(crate) ibc_counts: Map<'a, String, u32>,
+    pub(crate) ibc_timeouts: Map<'a, String, u32>,
 }
 
 // Note that #[entry_points] is added above the #[contract].
@@ -35,12 +35,15 @@ pub struct CounterContract<'a> {
 // #[sv::override_entry_point(ibc_channel_open=crate::ibc::ibc_channel_open(IbcChannelOpenMsg))]
 // TODO: override IBC entry points from ibs.rs when possible... for now Sylvia does not support it
 #[messages(crate::whitelist as Whitelist)]
+#[messages(crate::ibc as Ibc)]
 impl CounterContract<'_> {
     pub const fn new() -> Self {
         Self {
             count: Item::new("count"),
             owner: Item::new("owner"),
             admins: Item::new("admins"),
+            ibc_counts: Map::new("ibc_counts"),
+            ibc_timeouts: Map::new("ibc_timeouts"),
         }
     }
 
@@ -102,17 +105,17 @@ impl CounterContract<'_> {
         Ok(Response::default())
     }
 
-    fn is_admin_or_owner(&self, storage: &mut dyn Storage, address: &Addr) -> bool {
+    pub(crate) fn is_admin_or_owner(&self, storage: &mut dyn Storage, address: &Addr) -> bool {
         return self.is_owner(storage, address) || self.is_admin(storage, address);
     }
 
-    fn is_owner(&self, storage: &mut dyn Storage, address: &Addr) -> bool {
+    pub(crate) fn is_owner(&self, storage: &mut dyn Storage, address: &Addr) -> bool {
         // basically fail if unable to load state... be on the safe side
         let owner: Addr = self.owner.load(storage).unwrap_or(Addr::unchecked("error"));
         owner == address
     }
 
-    fn is_admin(&self, storage: &mut dyn Storage, address: &Addr) -> bool {
+    pub(crate) fn is_admin(&self, storage: &mut dyn Storage, address: &Addr) -> bool {
         // basically fail if unable to load state... be on the safe side
         let admins: Vec<Addr> = self.admins.load(storage).unwrap_or(vec![]);
         match admins.binary_search(address) {
@@ -121,24 +124,3 @@ impl CounterContract<'_> {
         }
     }
 }
-
-// #[cfg_attr(not(feature = "library"), entry_point)]
-// pub fn execute(
-//     _deps: DepsMut,
-//     env: Env,
-//     _info: MessageInfo,
-//     msg: ExecuteMsg,
-// ) -> Result<Response, ContractError> {
-//     match msg {
-//         ExecuteMsg::Increment { channel } => Ok(Response::new()
-//             .add_attribute("method", "execute_increment")
-//             .add_attribute("channel", channel.clone())
-//             // outbound IBC message, where packet is then received on other chain
-//             .add_message(IbcMsg::SendPacket {
-//                 channel_id: channel,
-//                 data: to_binary(&IbcExecuteMsg::Increment {})?,
-//                 // default timeout of two minutes.
-//                 timeout: IbcTimeout::with_timestamp(env.block.time.plus_seconds(120)),
-//             })),
-//     }
-// }

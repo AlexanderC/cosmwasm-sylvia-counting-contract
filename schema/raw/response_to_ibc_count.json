@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "IbcCountResponse",
+  "type": "object",
+  "required": [
+    "count",
+    "ibc_channel_counts",
+    "ibc_channel_timeouts"
+  ],
+  "properties": {
+    "count": {
+      "type": "integer",
+      "format": "uint32",
+      "minimum": 0.0
+    },
+    "ibc_channel_counts": {
+      "type": "integer",
+      "format": "uint32",
+      "minimum": 0.0
+    },
+    "ibc_channel_timeouts": {
+      "type": "integer",
+      "format": "uint32",
+      "minimum": 0.0
+    }
+  },
+  "additionalProperties": false
+}

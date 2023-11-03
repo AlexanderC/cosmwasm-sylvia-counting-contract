@@ -38,6 +38,9 @@
         "$ref": "#/definitions/WhitelistExecMsg"
       },
       {
+        "$ref": "#/definitions/IbcExecMsg"
+      },
+      {
         "$ref": "#/definitions/ExecMsg"
       }
     ],
@@ -76,6 +79,50 @@
             "properties": {
               "reset_counter": {
                 "type": "object"
+              }
+            },
+            "additionalProperties": false
+          }
+        ]
+      },
+      "IbcExecMsg": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "increment_ibc_count"
+            ],
+            "properties": {
+              "increment_ibc_count": {
+                "type": "object",
+                "required": [
+                  "channel"
+                ],
+                "properties": {
+                  "channel": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": [
+              "decrement_ibc_count"
+            ],
+            "properties": {
+              "decrement_ibc_count": {
+                "type": "object",
+                "required": [
+                  "channel"
+                ],
+                "properties": {
+                  "channel": {
+                    "type": "string"
+                  }
+                }
               }
             },
             "additionalProperties": false
@@ -136,10 +183,37 @@
         "$ref": "#/definitions/WhitelistQueryMsg"
       },
       {
+        "$ref": "#/definitions/IbcQueryMsg"
+      },
+      {
         "$ref": "#/definitions/QueryMsg"
       }
     ],
     "definitions": {
+      "IbcQueryMsg": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "ibc_count"
+            ],
+            "properties": {
+              "ibc_count": {
+                "type": "object",
+                "required": [
+                  "channel"
+                ],
+                "properties": {
+                  "channel": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        ]
+      },
       "QueryMsg": {
         "oneOf": [
           {
@@ -221,6 +295,34 @@
       ],
       "properties": {
         "count": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0.0
+        }
+      },
+      "additionalProperties": false
+    },
+    "ibc_count": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "IbcCountResponse",
+      "type": "object",
+      "required": [
+        "count",
+        "ibc_channel_counts",
+        "ibc_channel_timeouts"
+      ],
+      "properties": {
+        "count": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0.0
+        },
+        "ibc_channel_counts": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0.0
+        },
+        "ibc_channel_timeouts": {
           "type": "integer",
           "format": "uint32",
           "minimum": 0.0

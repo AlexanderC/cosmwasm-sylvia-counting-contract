@@ -6,6 +6,9 @@
       "$ref": "#/definitions/WhitelistExecMsg"
     },
     {
+      "$ref": "#/definitions/IbcExecMsg"
+    },
+    {
       "$ref": "#/definitions/ExecMsg"
     }
   ],
@@ -44,6 +47,50 @@
           "properties": {
             "reset_counter": {
               "type": "object"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "IbcExecMsg": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "increment_ibc_count"
+          ],
+          "properties": {
+            "increment_ibc_count": {
+              "type": "object",
+              "required": [
+                "channel"
+              ],
+              "properties": {
+                "channel": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "decrement_ibc_count"
+          ],
+          "properties": {
+            "decrement_ibc_count": {
+              "type": "object",
+              "required": [
+                "channel"
+              ],
+              "properties": {
+                "channel": {
+                  "type": "string"
+                }
+              }
             }
           },
           "additionalProperties": false

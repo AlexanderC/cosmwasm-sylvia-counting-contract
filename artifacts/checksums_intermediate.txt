@@ -1,1 +1,1 @@
-f81385f9b840a9198a6014b5df120c794b01cedfa0525ca358d41349c1ac2a20  /target/wasm32-unknown-unknown/release/counting_contract.wasm
+01b07c5688c513de69a7eddc2646bd1616f3daf0162f5321fec6c9f656e0a054  /target/wasm32-unknown-unknown/release/counting_contract.wasm

@@ -63,10 +63,4 @@ impl Whitelist for CounterContract<'_> {
         let admins: Vec<Addr> = self.admins.load(deps.storage)?;
         Ok(AdminsResponse { admins })
     }
-
-    fn is_owner(&self, storage: &mut dyn Storage, address: &Addr) -> bool {
-        // basically fail if unable to load state... be on the safe side
-        let owner: Addr = self.owner.load(storage).unwrap_or(Addr::unchecked("error"));
-        owner == address
-    }
 }
