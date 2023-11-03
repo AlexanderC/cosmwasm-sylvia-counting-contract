@@ -1,9 +1,10 @@
-# CosmWasm/Sylvia test contracts (learning Sylvia/CosmWasm)
+# CosmWasm/Sylvia counting contract w/ IBC enabled (Cosmos, Rust, CosmWasm, Sylvia)
 
-This repository contains test contracts created during study of CosmWasm/Sylvia based contracts development for Cosmos blockchains written using Rust.
+This repository contains counting contract created during the study of CosmWasm/Sylvia and IBC based contracts development for Cosmos blockchains written using Rust.
 
 > The IBC implementation attempt on Sylvia is based on https://github.com/0xekez/cw-ibc-example as at the time of
-> writing this the https://cosmwasm.github.io/sylvia-book/ibc.html#ibc section is empty...
+> writing this the https://cosmwasm.github.io/sylvia-book/ibc.html#ibc section is empty.
+> Moreover Sylvia does NOT support natively IBC, see maintainer comment https://github.com/CosmWasm/sylvia/issues/19#issuecomment-1792586062.
 
 ## Preface
 
