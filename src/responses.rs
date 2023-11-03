@@ -7,6 +7,11 @@ pub struct CountResponse {
 }
 
 #[cw_serde]
+pub struct OwnerResponse {
+    pub owner: Addr,
+}
+
+#[cw_serde]
 pub struct AdminsResponse {
     pub admins: Vec<Addr>,
 }

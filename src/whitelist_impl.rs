@@ -1,4 +1,4 @@
-use cosmwasm_std::{Addr, Response, StdResult};
+use cosmwasm_std::{Addr, Response, StdResult, Storage, ensure};
 use sylvia::contract;
 use sylvia::types::{ExecCtx, QueryCtx};
 
@@ -15,24 +15,35 @@ impl Whitelist for CounterContract<'_> {
     #[msg(exec)]
     fn add_admin(&self, ctx: ExecCtx, admin: String) -> Result<Response, Self::Error> {
         let deps = ctx.deps;
+        let storage: &mut dyn Storage = deps.storage;
         let admin = deps.api.addr_validate(&admin)?;
 
+        ensure!(
+            self.is_owner(storage, &ctx.info.sender),
+            ContractError::NotTheOwner(ctx.info.sender)
+        );
+
         self.admins
-            .update(deps.storage, |mut admins| -> StdResult<_> {
+            .update(storage, |mut admins| -> StdResult<_> {
                 admins.push(admin);
                 admins.sort();
                 admins.dedup();
 
                 Ok(admins)
             })?;
-
         Ok(Response::default())
     }
 
     #[msg(exec)]
     fn remove_admin(&self, ctx: ExecCtx, admin: String) -> Result<Response, Self::Error> {
         let deps = ctx.deps;
+        let storage: &mut dyn Storage = deps.storage;
         let admin = deps.api.addr_validate(&admin)?;
+
+        ensure!(
+            self.is_owner(storage, &ctx.info.sender),
+            ContractError::NotTheOwner(ctx.info.sender)
+        );
 
         self.admins
             .update(deps.storage, |admins| -> StdResult<_> {
@@ -43,7 +54,6 @@ impl Whitelist for CounterContract<'_> {
 
                 Ok(admins)
             })?;
-
         Ok(Response::default())
     }
 
@@ -51,7 +61,12 @@ impl Whitelist for CounterContract<'_> {
     fn admins(&self, ctx: QueryCtx) -> Result<AdminsResponse, Self::Error> {
         let deps = ctx.deps;
         let admins: Vec<Addr> = self.admins.load(deps.storage)?;
-
         Ok(AdminsResponse { admins })
+    }
+
+    fn is_owner(&self, storage: &mut dyn Storage, address: &Addr) -> bool {
+        // basically fail if unable to load state... be on the safe side
+        let owner: Addr = self.owner.load(storage).unwrap_or(Addr::unchecked("error"));
+        owner == address
     }
 }

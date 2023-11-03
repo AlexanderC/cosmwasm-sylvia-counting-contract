@@ -15,7 +15,9 @@ fn instantiate() {
     let contract = code_id.instantiate(42, vec![]).call(owner).unwrap();
 
     let count = contract.count().unwrap().count;
+    let owner_addr = contract.owner().unwrap().owner;
     assert_eq!(count, 42);
+    assert_eq!(owner_addr, Addr::unchecked(owner));
 
     contract.increment_count().call(owner).unwrap();
 
@@ -67,7 +69,7 @@ fn reset_counter() {
     assert_eq!(count, 0);
 
     let err = contract.reset_counter().call(random_user).unwrap_err();
-    assert_eq!(err, ContractError::NotAnAdmin(Addr::unchecked(random_user)));
+    assert_eq!(err, ContractError::NotAnAdminNorOwner(Addr::unchecked(random_user)));
 }
 
 #[test]
@@ -77,12 +79,13 @@ fn manage_admins() {
 
     let owner = "owner";
     let admin = "admin";
+    let random_user = "random";
 
     let contract = code_id.instantiate(1, vec![]).call(owner).unwrap();
 
     // Admins list is empty
     let admins = contract.whitelist_proxy().admins().unwrap().admins;
-    assert_eq!(admins, &[Addr::unchecked(owner)]);
+    assert!(admins.is_empty());
 
     // Admin can be added
     contract
@@ -92,15 +95,23 @@ fn manage_admins() {
         .unwrap();
 
     let admins = contract.whitelist_proxy().admins().unwrap().admins;
-    assert_eq!(admins, &[Addr::unchecked(admin), Addr::unchecked(owner)]);
+    assert_eq!(admins, &[Addr::unchecked(admin)]);
+
+    // Admin can NOT be removed nor added by a random Joe
+    let err = contract
+        .whitelist_proxy()
+        .remove_admin(admin.to_owned())
+        .call(random_user)
+        .unwrap_err();
+    assert_eq!(err, ContractError::NotTheOwner(Addr::unchecked(random_user)));
 
     // Admin can be removed
     contract
         .whitelist_proxy()
-        .remove_admin(owner.to_owned())
+        .remove_admin(admin.to_owned())
         .call(owner)
         .unwrap();
 
     let admins = contract.whitelist_proxy().admins().unwrap().admins;
-    assert_eq!(admins, &[Addr::unchecked(admin)]);
+    assert!(admins.is_empty());
 }

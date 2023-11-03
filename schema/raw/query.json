@@ -23,6 +23,18 @@
             }
           },
           "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "owner"
+          ],
+          "properties": {
+            "owner": {
+              "type": "object"
+            }
+          },
+          "additionalProperties": false
         }
       ]
     },

@@ -1,4 +1,4 @@
-use contract::contract::{ContractExecMsg, ContractQueryMsg, InstantiateMsg};
+use counting_contract::contract::{ContractExecMsg, ContractQueryMsg, InstantiateMsg};
 use cosmwasm_schema::write_api;
 
 fn main() {

@@ -1,4 +1,4 @@
-use cosmwasm_std::{Response, StdError};
+use cosmwasm_std::{Response, StdError, Storage, Addr};
 use sylvia::interface;
 use sylvia::types::{ExecCtx, QueryCtx};
 
@@ -16,4 +16,6 @@ pub trait Whitelist {
 
     #[msg(query)]
     fn admins(&self, ctx: QueryCtx) -> Result<AdminsResponse, Self::Error>;
+
+    fn is_owner(&self, storage: &mut dyn Storage, address: &Addr) -> bool;
 }

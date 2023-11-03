@@ -10,8 +10,8 @@ This repository contains test contracts created during study of CosmWasm/Sylvia 
 Rust library skeleton generated using:
 
 ```
-cargo new --lib ./contract
-cd ./contract
+cargo new --lib ./counting-contract
+cd ./counting-contract
 cargo check
 ```
 
@@ -31,7 +31,7 @@ To deploy and operate the contracts `junod` (https://docs.junonetwork.io/validat
 git clone https://github.com/CosmosContracts/juno
 cd juno
 git fetch
-git checkout v9.0.0
+git checkout v17.1.1
 ```
 
 ## Build
@@ -43,7 +43,7 @@ Built contract to artifacts:
 ```
 // cargo wasm-debug
 cargo wasm
-cosmwasm-check target/wasm32-unknown-unknown/release/contract.wasm
+cosmwasm-check target/wasm32-unknown-unknown/release/counting_contract.wasm
 ```
 
 Generate contract schemas:
@@ -59,7 +59,7 @@ docker run --rm -v "$(pwd)":/code \
   --mount type=volume,source="$(basename "$(pwd)")_cache",target=/code/target \
   --mount type=volume,source=registry_cache,target=/usr/local/cargo/registry \
   cosmwasm/rust-optimizer:0.14.0
-cosmwasm-check artifacts/contract.wasm
+cosmwasm-check artifacts/counting_contract.wasm
 ```
 
 ## Unit Testing
@@ -88,8 +88,9 @@ junod keys add wallet2
 // wallet2 address: juno1qqkj8r6hfqh93jq65jermsmq288je7873jmjh5
 ```
 
-> `junod` is a binary similar to `wasmd` working with `Juno - Interoperable Smart Contract Network`
+> `junod` is a binary similar to `wasmd` working with `Juno - Interoperable Smart Contract Network`.
 
+> May you want to query wallet balances use `junod query bank balances juno1dkgs7ymhmnnu3c874wyaakh03jn9l3fes52jxg`
 
 We will deploy the contract to `uni-6` and `juno-1` using `junod` binary. 
 
@@ -98,25 +99,48 @@ We will deploy the contract to `uni-6` and `juno-1` using `junod` binary.
 First we upload the code:
 
 ```
-junod tx wasm store artifacts/contract.wasm --chain-id=uni-6 --from wallet -y --gas=auto --gas-adjustment=1.15 --gas-prices="0.025ujunox" -b block
-junod tx wasm store artifacts/contract.wasm --chain-id=juno-1 --from wallet -y --gas=auto --gas-adjustment=1.15 --gas-prices="0.025ujunox" -b block
+// Chain A
+junod tx wasm store artifacts/counting_contract.wasm --chain-id=uni-6 --from wallet -y --gas=auto --gas-adjustment=1.15 --gas-prices="0.025ujunox" -b sync
+
+// Chain B
+junod tx wasm store artifacts/counting_contract.wasm --chain-id=juno-1 --from wallet -y --gas=auto --gas-adjustment=1.15 --gas-prices="0.025ujunox" -b sync
 ```
 
-> To get contract code ID you must query the `txhash`, e.g.: `junod q tx 8618FB149493E47E42372C88B4B20161819C446AF5A75FCD5F776622F3655E51 --output=json`
+> To get contract code ID you must query the `txhash`, e.g.: `junod q tx 5BCC9D7259D706F4683A38935B43D5136E026BAEC20A805D335DF3B532F66489 --output=json`
 
 Than we instantiate the contracts on both networks:
 
 ```
-CODE_ID=1
-junod tx wasm instantiate "$CODE_ID" '{"count":0,"admins":[]}' --label "counting-contract" --chain-id=uni-6 -y --admin wallet --gas=auto --gas-adjustment=1.15 --gas-prices="0.025ujunox"
+// Chain A
+CODE_ID=3859
+junod tx wasm instantiate "$CODE_ID" '{"count":0,"admins":[]}' --label "counting-contract" --chain-id=uni-6 -y --from wallet --admin wallet --gas=auto --gas-adjustment=1.15 --gas-prices="0.025ujunox"
 
-CODE_ID=2
-junod tx wasm instantiate "$CODE_ID" '{"count":0,"admins":[]}' --label "counting-contract" --chain-id=juno-1 -y --admin wallet --gas=auto --gas-adjustment=1.15 --gas-prices="0.025ujunox"
+// Chain B
+CODE_ID=xxxx
+junod tx wasm instantiate "$CODE_ID" '{"count":0,"admins":[]}' --label "counting-contract" --chain-id=juno-1 -y --from wallet --admin wallet --gas=auto --gas-adjustment=1.15 --gas-prices="0.025ujunox"
 ```
+
+> To get initiation info you must query the `txhash`, e.g.: `junod q tx 0DF4AC04842D9C2056E99CA32C5EE39E9B5FDB206C3EDADC7F7F81CB000306E8 --output=json`
+
+Now we need to query the instantiated contracts:
+
+```
+// Chain A
+CONTRANT_ADDRESS=juno175jthggp4drryjhfljzxxy0lnxfq3g4dfehahct95e22m57lhrxsw07f6e
+junod query wasm contract "$CONTRANT_ADDRESS"
+
+// Chain B
+CONTRANT_ADDRESS=xxxxxxxxxxxxxxxxxxx
+junod query wasm contract "$CONTRANT_ADDRESS"
+```
+
+> Look at `ibc_port_id` in the output. Should the contract have IBC entry points enabled it will contain a value e.g. `wasm.juno175jthggp4drryjhfljzxxy0lnxfq3g4dfehahct95e22m57lhrxsw07f6e`
 
 Afterwards, in order to get IBC running we need to start the relayer.
 
 ```
-hermes create channel --a-chain uni-6 --b-chain juno-1 --a-port wasm.juno1r8k4hf7umksu9w53u4sz0jsla5478am6yxr0mhkuvp00yvtmxexsj8wazt --b-port wasm.juno1fsay0zux2vkyrsqpepd08q2vlytrfu7gsqnapsfl9ge8mp6fvx3qf062q9 --channel-version counter-1
+IBC_PORT_A=wasm.juno175jthggp4drryjhfljzxxy0lnxfq3g4dfehahct95e22m57lhrxsw07f6e
+IBC_PORT_B=xxxxxxxxx
+hermes create channel --a-chain uni-6 --b-chain juno-1 --a-port "$IBC_PORT_A" --b-port "$IBC_PORT_B" --channel-version counter-contract-1
 hermes start
 ```
