@@ -1,0 +1,67 @@
+[global]
+log_level = "info"
+
+[mode.clients]
+enabled = true
+refresh = true
+misbehaviour = true
+
+[mode.connections]
+enabled = false
+
+[mode.channels]
+enabled = false
+
+[mode.packets]
+enabled = true
+clear_interval = 100
+clear_on_start = true
+tx_confirmation = false
+auto_register_counterparty_payee = false
+
+[rest]
+enabled = false
+host = "127.0.0.1"
+port = 3000
+
+[telemetry]
+enabled = false
+host = "127.0.0.1"
+port = 3001
+
+[telemetry.buckets.latency_submitted]
+start = 500
+end = 20000
+buckets = 10
+
+[telemetry.buckets.latency_confirmed]
+start = 1000
+end = 30000
+buckets = 10
+
+[tracing_server]
+enabled = false
+port = 5555
+
+[[chains]]
+id = 'uni-6'
+rpc_addr = 'https://juno-testnet-rpc.polkachu.com:443'
+grpc_addr = 'https://juno-testnet-grpc.polkachu.com:12690'
+rpc_timeout = '10s'
+event_source = { mode = 'pull', interval = '1s' }
+account_prefix = 'juno'
+key_name = 'relayer'
+store_prefix = 'ibc'
+max_tx_size = 180000
+max_gas = 2000000
+gas_price = { price = 0.025, denom = 'ujunox' }
+gas_multiplier = 1.15
+clock_drift = '15s'
+trusting_period = '14days'
+trust_threshold = { numerator = '1', denominator = '3' }
+memo_prefix = '<Service provider> IBC service'
+[chains.packet_filter]
+policy = 'allow'
+list = [
+  ['transfer', 'channel-20']
+  ]

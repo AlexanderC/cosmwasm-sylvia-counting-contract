@@ -140,7 +140,9 @@ junod query wasm contract "$CONTRANT_ADDRESS"
 Before starting the relayer we need to configure it:
 
 ```
-TBD
+mkdir ~/.hermes && touch ~/.hermes/config.toml
+cat .hermes.config.toml > ~/.hermes/config.toml
+hermes config validate
 ```
 
 Afterwards, in order to get IBC running we need to create the relayer channel and start it:
