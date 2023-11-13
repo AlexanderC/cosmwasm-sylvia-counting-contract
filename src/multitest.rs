@@ -1,9 +1,7 @@
-use cosmwasm_std::Addr;
+use cosmwasm_std::{Addr, to_binary, to_json_binary};
 use sylvia::multitest::App;
 
-use crate::{
-    contract::multitest_utils::CodeId, error::ContractError, whitelist_impl::test_utils::Whitelist,
-};
+use crate::{contract::sv::multitest_utils::CodeId, error::ContractError, ibc_msg::IbcExecuteMsg, whitelist_impl::sv::test_utils::Whitelist};
 
 #[test]
 fn instantiate() {
@@ -114,4 +112,12 @@ fn manage_admins() {
 
     let admins = contract.whitelist_proxy().admins().unwrap().admins;
     assert!(admins.is_empty());
+}
+
+#[test]
+fn ibc() {
+    assert_eq!(IbcExecuteMsg::IncrementCount {}.to_string(), "increment_ibc_count");
+    assert_eq!(IbcExecuteMsg::DecrementCount {}.to_string(), "decrement_ibc_count");
+    assert_eq!(to_json_binary(&IbcExecuteMsg::IncrementCount {}), to_binary(&IbcExecuteMsg::IncrementCount {}));
+    assert_eq!(to_json_binary(&IbcExecuteMsg::DecrementCount {}), to_binary(&IbcExecuteMsg::DecrementCount {}));
 }

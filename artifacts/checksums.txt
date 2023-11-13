@@ -1,1 +1,1 @@
-f58ea41ef9520d745d1034b8985bdecfe89af85753cfb471e3d717bf2e6d37ad  counting_contract.wasm
+4d998f4316a4a5ceeb25362db2e9d9bf386119370a5ab1e6d302467f19d6db6b  counting_contract.wasm

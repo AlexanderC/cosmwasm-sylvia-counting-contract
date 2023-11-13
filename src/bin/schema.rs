@@ -1,5 +1,5 @@
-use counting_contract::contract::{ContractExecMsg, ContractQueryMsg, InstantiateMsg};
 use cosmwasm_schema::write_api;
+use counting_contract::contract::sv::{InstantiateMsg, ContractExecMsg, ContractQueryMsg};
 
 fn main() {
     write_api! {

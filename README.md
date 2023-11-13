@@ -130,13 +130,13 @@ junod tx wasm store artifacts/counting_contract.wasm --chain-id=uni-6 --from wal
 osmosisd tx wasm store artifacts/counting_contract.wasm --chain-id=osmo-test-5 --from wallet -y --gas=auto --gas-adjustment=1.15 --gas-prices="0.025uosmo" -b sync
 ```
 
-> To get contract code ID you must query the `txhash`, e.g.: `junod q tx 9C3193DF97AEED37250FE99752DA17482E242B444FDD6D90449715027C72A823 --output=json` and `osmosisd q tx 8A8E552A55D24D0068647BEE6B03E04EC069272F341467955E1FABE37720BAFB --output=json`
+> To get contract code ID you must query the `txhash`, e.g.: `junod q tx 0C911A8A7790470297CB5A17C2198F2FD5321BCA9DF8B92D62781745EEBD3F37 --output=json` and `osmosisd q tx 8A8E552A55D24D0068647BEE6B03E04EC069272F341467955E1FABE37720BAFB --output=json`
 
 Than we instantiate the contracts on both networks:
 
 ```
 // Chain A
-CODE_ID=3860
+CODE_ID=3883
 junod tx wasm instantiate "$CODE_ID" '{"count":0,"admins":[]}' --label "counting-contract" --chain-id=uni-6 -y --from wallet --admin wallet --gas=auto --gas-adjustment=1.15 --gas-prices="0.025ujunox"
 
 // Chain B
@@ -144,13 +144,13 @@ CODE_ID=5085
 osmosisd tx wasm instantiate "$CODE_ID" '{"count":0,"admins":[]}' --label "counting-contract" --chain-id=osmo-test-5 -y --from wallet --admin wallet --gas=auto --gas-adjustment=1.15 --gas-prices="0.025uosmo"
 ```
 
-> To get initiation info you must query the `txhash`, e.g.: `junod q tx 4FA0F94DFB11CA03A7476051367A6EB97B2DAED38E494C25E8F7BCA3543F523C --output=json` and `osmosisd q tx 197AC7FA66DA0E5E35EDE2F822F8DC6A54DDD5936D28B7812DC2DC7DE3A41414 --output=json`
+> To get initiation info you must query the `txhash`, e.g.: `junod q tx BF1862AD34C328A30D0CE99DD684E71E015FB2E95D29D55AD603B24A7324EB14 --output=json` and `osmosisd q tx 197AC7FA66DA0E5E35EDE2F822F8DC6A54DDD5936D28B7812DC2DC7DE3A41414 --output=json`
 
 Now we need to query the instantiated contracts:
 
 ```
 // Chain A
-CONTRANT_ADDRESS=juno10ddh59fvqsjjkz87edsn3368ph0xd2fsw9a0dsm3waqkg9e4r23qakjkrf
+CONTRANT_ADDRESS=juno1wjjx974u9j80wazvxsx3ukr85jmazk7szk37qn0kmelu98gl620qwxqxz0
 junod query wasm contract "$CONTRANT_ADDRESS"
 
 // Chain B
@@ -158,7 +158,7 @@ CONTRANT_ADDRESS=osmo1xz00vhlm7e3ysj9f2v3jtcjpqvectwgdkkxuau8rw290ys087s6qtk24hy
 osmosisd query wasm contract "$CONTRANT_ADDRESS"
 ```
 
-> Look at `ibc_port_id` in the output. Should the contract have IBC entry points enabled it will contain a value e.g. `wasm.juno175jthggp4drryjhfljzxxy0lnxfq3g4dfehahct95e22m57lhrxsw07f6e`
+> Look at `ibc_port_id` in the output. Should the contract have IBC entry points enabled it will contain a value e.g. `wasm.juno1wjjx974u9j80wazvxsx3ukr85jmazk7szk37qn0kmelu98gl620qwxqxz0`
 
 Before starting the relayer we need to configure it:
 
@@ -177,11 +177,137 @@ hermes keys add --chain osmo-test-5 --key-file .wallet.osmosis
 
 > May you want to query balances use `hermes keys balance --chain osmo-test-5`
  and `hermes keys balance --chain uni-6`
-Afterwards, in order to get IBC running we need to create the relayer channel and start it:
+
+Afterwards, in order to get IBC running we need to create the relayer channel:
 
 ```
-IBC_PORT_A=wasm.juno10ddh59fvqsjjkz87edsn3368ph0xd2fsw9a0dsm3waqkg9e4r23qakjkrf
+IBC_PORT_A=wasm.juno1wjjx974u9j80wazvxsx3ukr85jmazk7szk37qn0kmelu98gl620qwxqxz0
 IBC_PORT_B=wasm.osmo1xz00vhlm7e3ysj9f2v3jtcjpqvectwgdkkxuau8rw290ys087s6qtk24hy
 hermes create channel --a-chain uni-6 --b-chain osmo-test-5 --a-port "$IBC_PORT_A" --b-port "$IBC_PORT_B" --channel-version counter-contract-1 --new-client-connection
+```
+
+After successfully running `hermes create channel` you should see smth like:
+
+```json
+SUCCESS Channel {
+    ordering: Unordered,
+    a_side: ChannelSide {
+        chain: BaseChainHandle {
+            chain_id: ChainId {
+                id: "uni-6",
+                version: 6,
+            },
+            runtime_sender: Sender { .. },
+        },
+        client_id: ClientId(
+            "07-tendermint-691",
+        ),
+        connection_id: ConnectionId(
+            "connection-782",
+        ),
+        port_id: PortId(
+            "wasm.juno1wjjx974u9j80wazvxsx3ukr85jmazk7szk37qn0kmelu98gl620qwxqxz0",
+        ),
+        channel_id: Some(
+            ChannelId(
+                "channel-839",
+            ),
+        ),
+        version: Some(
+            Version(
+                "counter-contract-1",
+            ),
+        ),
+    },
+    b_side: ChannelSide {
+        chain: BaseChainHandle {
+            chain_id: ChainId {
+                id: "osmo-test-5",
+                version: 5,
+            },
+            runtime_sender: Sender { .. },
+        },
+        client_id: ClientId(
+            "07-tendermint-1424",
+        ),
+        connection_id: ConnectionId(
+            "connection-1329",
+        ),
+        port_id: PortId(
+            "wasm.osmo1xz00vhlm7e3ysj9f2v3jtcjpqvectwgdkkxuau8rw290ys087s6qtk24hy",
+        ),
+        channel_id: Some(
+            ChannelId(
+                "channel-4347",
+            ),
+        ),
+        version: Some(
+            Version(
+                "counter-contract-1",
+            ),
+        ),
+    },
+    connection_delay: 0ns,
+}
+```
+
+Before starting the channel relayer you need to update `~/.hermes/config.toml` and add proper channel list (see create channel command output— to allow created channels):
+
+```
+// UPDATE [[chains]]: list = [["wasm.juno1wjjx974u9j80wazvxsx3ukr85jmazk7szk37qn0kmelu98gl620qwxqxz0", "channel-839"], ["wasm.osmo1xz00vhlm7e3ysj9f2v3jtcjpqvectwgdkkxuau8rw290ys087s6qtk24hy", "channel-4347"]]
+cat .hermes.config.toml > ~/.hermes/config.toml
+hermes config validate
 hermes start
 ```
+
+## Interacting with contracts (Testnet)
+
+First we set contract addresses so we can use them:
+
+```
+CONTRANT_ADDRESS_A=juno1wjjx974u9j80wazvxsx3ukr85jmazk7szk37qn0kmelu98gl620qwxqxz0
+CONTRANT_ADDRESS_B=osmo1xz00vhlm7e3ysj9f2v3jtcjpqvectwgdkkxuau8rw290ys087s6qtk24hy
+```
+
+Check our counters states on both chains:
+
+```
+junod query wasm contract-state smart "$CONTRANT_ADDRESS_A" '{"count": {}}' --chain-id=uni-6
+junod query wasm contract-state smart "$CONTRANT_ADDRESS_A" '{"ibc_count": {"channel": "channel-839"}}' --chain-id=uni-6
+
+osmosisd query wasm contract-state smart "$CONTRANT_ADDRESS_B" '{"count": {}}' --chain-id=osmo-test-5
+osmosisd query wasm contract-state smart "$CONTRANT_ADDRESS_B" '{"ibc_count": {"channel": "channel-4347"}}' --chain-id=osmo-test-5
+```
+
+Let's try to increment counts directly (on Juno):
+
+```
+junod tx wasm execute "$CONTRANT_ADDRESS_A" '{"increment_count": {}}' --chain-id=uni-6 --from wallet -y --gas=auto --gas-adjustment=1.3 --gas-prices="0.025ujunox" -b sync
+// Now query the contract on Juno and check results
+junod query wasm contract-state smart "$CONTRANT_ADDRESS_A" '{"count": {}}' --chain-id=uni-6
+junod query wasm contract-state smart "$CONTRANT_ADDRESS_A" '{"ibc_count": {"channel": "channel-4347"}}' --chain-id=uni-6
+```
+
+And use IBC called on Osmosis contract (local `channel_id=channel-4347`) to increment Juno contract count... remotely!:
+
+```
+osmosisd tx wasm execute "$CONTRANT_ADDRESS_B" '{"increment_ibc_count": {"channel": "channel-4347"}}' --chain-id=osmo-test-5 -y --from wallet --gas=auto --gas-adjustment=1.3 --gas-prices="0.025uosmo"
+// Now query the contract on Juno and check results
+junod query wasm contract-state smart "$CONTRANT_ADDRESS_A" '{"ibc_count": {"channel": "channel-839"}}' --chain-id=uni-6
+```
+
+...now let's decrease count in Juno contract through Osmosis:
+
+```
+osmosisd tx wasm execute "$CONTRANT_ADDRESS_B" '{"decrement_ibc_count": {"channel": "channel-4347"}}' --chain-id=osmo-test-5 -y --from wallet --gas=auto --gas-adjustment=1.3 --gas-prices="0.025uosmo"
+// Now query the contract on Juno and check results
+junod query wasm contract-state smart "$CONTRANT_ADDRESS_A" '{"ibc_count": {"channel": "channel-839"}}' --chain-id=uni-6
+```
+
+...after all let's check what happened to Osmosis IBC related states:
+
+```
+osmosisd query wasm contract-state smart "$CONTRANT_ADDRESS_B" '{"ibc_count": {"channel": "channel-4347"}}' --chain-id=osmo-test-5
+```
+
+> In case your relayer was not working you might have some `ibc_channel_timeouts` stored... If not— stop relayer for a while and repeat the steps above; you will see NO increase in counter states on remote contract and `ibc_channel_timeouts` number increasing with every call to `increment_ibc_count` or `decrement_ibc_count`.
