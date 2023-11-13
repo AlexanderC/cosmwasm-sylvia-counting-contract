@@ -1,4 +1,4 @@
-use cosmwasm_std::{to_binary, IbcMsg, IbcTimeout, Response};
+use cosmwasm_std::{IbcMsg, IbcTimeout, Response, to_json_binary};
 use sylvia::contract;
 use sylvia::types::{ExecCtx, QueryCtx};
 
@@ -39,7 +39,7 @@ impl Ibc for CounterContract<'_> {
             // outbound IBC message, where packet is then received on other chain
             .add_message(IbcMsg::SendPacket {
                 channel_id: channel,
-                data: to_binary(&IbcExecuteMsg::IncrementCount {})?,
+                data: to_json_binary(&IbcExecuteMsg::IncrementCount {})?,
                 // default timeout of two minutes.
                 timeout: IbcTimeout::with_timestamp(ctx.env.block.time.plus_seconds(120)),
             }))
@@ -53,7 +53,7 @@ impl Ibc for CounterContract<'_> {
             // outbound IBC message, where packet is then received on other chain
             .add_message(IbcMsg::SendPacket {
                 channel_id: channel,
-                data: to_binary(&IbcExecuteMsg::DecrementCount {})?,
+                data: to_json_binary(&IbcExecuteMsg::DecrementCount {})?,
                 // default timeout of two minutes.
                 timeout: IbcTimeout::with_timestamp(ctx.env.block.time.plus_seconds(120)),
             }))

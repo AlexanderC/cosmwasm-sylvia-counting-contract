@@ -25,17 +25,17 @@ backtraces = ["cosmwasm-std/backtraces"]
 library = []
 
 [dependencies]
-cosmwasm-std = { version = "1.3.1", features = ["staking", "ibc3", "stargate"] }
+cosmwasm-std = { version = "1.4.1", features = ["staking", "ibc3", "stargate"] }
 sylvia = "0.8.1"
-schemars = "0.8.12"
-cosmwasm-schema = "1.3.1"
-serde = "1.0.180"
+schemars = "0.8.15"
+cosmwasm-schema = "1.5.0"
+serde = "1.0.192"
 cw-storage-plus = "1.1.0"
 cw-utils = "1.0.2"
-thiserror = "1.0.44"
+thiserror = "1.0.50"
 cw2 = "1.1.1"
 
 [dev-dependencies]
-anyhow = "1"
+anyhow = "1.0.75"
 cw-multi-test = "0.16.5"
 sylvia = { version = "0.8.1", features = ["mt"] }

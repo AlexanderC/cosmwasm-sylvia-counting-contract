@@ -3,7 +3,7 @@ use std::sync::Mutex;
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
-    from_binary, DepsMut, Env, IbcBasicResponse, IbcChannel, IbcChannelCloseMsg,
+    from_json, DepsMut, Env, IbcBasicResponse, IbcChannel, IbcChannelCloseMsg,
     IbcChannelConnectMsg, IbcChannelOpenMsg, IbcChannelOpenResponse, IbcOrder, IbcPacketAckMsg,
     IbcPacketReceiveMsg, IbcPacketTimeoutMsg, IbcReceiveResponse, StdResult,
 };
@@ -114,7 +114,7 @@ pub fn do_ibc_packet_receive(
 ) -> Result<IbcReceiveResponse, ContractError> {
     // The channel this packet is being relayed along on this chain.
     let channel = msg.packet.dest.channel_id;
-    let msg: IbcExecuteMsg = from_binary(&msg.packet.data)?;
+    let msg: IbcExecuteMsg = from_json(&msg.packet.data)?;
 
     let count = try_update_state(deps, msg.clone(), channel)?;
     Ok(IbcReceiveResponse::new()

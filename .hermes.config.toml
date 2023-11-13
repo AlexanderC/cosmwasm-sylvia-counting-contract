@@ -45,8 +45,8 @@ port = 5555
 
 [[chains]]
 id = 'uni-6'
-rpc_addr = 'https://juno-testnet-rpc.polkachu.com:443'
-grpc_addr = 'https://juno-testnet-grpc.polkachu.com:12690'
+rpc_addr = 'https://juno-testnet-rpc.polkachu.com/'
+grpc_addr = 'http://juno-testnet-grpc.polkachu.com:12690/'
 rpc_timeout = '10s'
 event_source = { mode = 'pull', interval = '1s' }
 account_prefix = 'juno'
@@ -65,3 +65,42 @@ policy = 'allow'
 list = [
   ['transfer', 'channel-20']
   ]
+
+[[chains]]
+id = "osmo-test-5"
+type = "CosmosSdk"
+rpc_addr = "https://rpc.osmotest5.osmosis.zone/"
+grpc_addr = "https://grpc.osmotest5.osmosis.zone/"
+rpc_timeout = "10s"
+trusted_node = false
+account_prefix = "osmo"
+key_name = "osmosis-key"
+key_store_type = "Test"
+store_prefix = "ibc"
+default_gas = 100000
+max_gas = 400000
+gas_multiplier = 1.1
+max_msg_num = 30
+max_tx_size = 180000
+max_grpc_decoding_size = 33554432
+clock_drift = "5s"
+max_block_time = "30s"
+ccv_consumer_chain = false
+memo_prefix = ""
+sequential_batch_tx = false
+[chains.event_source]
+mode = "push"
+url = "wss://rpc.osmotest5.osmosis.zone:433/websocket"
+batch_delay = "500ms"
+[chains.trust_threshold]
+numerator = "1"
+denominator = "3"
+[chains.gas_price]
+price = 0.1
+denom = "uosmo"
+[chains.packet_filter]
+policy = "allow"
+list = [["transfer", "channel-1497"]]
+[chains.packet_filter.min_fees]
+[chains.address_type]
+derivation = "cosmos"
