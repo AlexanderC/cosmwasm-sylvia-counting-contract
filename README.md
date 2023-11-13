@@ -97,6 +97,7 @@ junod keys add wallet2
 // wallet2 address: juno1qqkj8r6hfqh93jq65jermsmq288je7873jmjh5
 junod keys add wallet-ibc --output json > .wallet.junod
 // wallet-ibc address: juno1hhfw77usyd6t8y9xuj6xlmqq5nkuqyc9vkcsha
+// wallet-ibc explorer: https://www.mintscan.io/juno-testnet/address/juno1hhfw77usyd6t8y9xuj6xlmqq5nkuqyc9vkcsha
 ```
 
 > Latest faucet working is `https://faucet.reece.sh/uni-6/YOUR-ADDRESS-HERE`. Probably won't work for you though...
@@ -112,6 +113,7 @@ osmosisd keys add wallet2
 // wallet2 address: osmo1xdk392u7y36s4fe06eu04e6mt7x4kt5793takz
 osmosisd keys add wallet-ibc --output json > .wallet.osmosis
 // wallet-ibc address: osmo1fywaxmn73dja3kmd5deuv2gf46ktna6f6el3aw
+// wallet-ibc explorer: https://testnet.mintscan.io/osmosis-testnet/account/osmo1fywaxmn73dja3kmd5deuv2gf46ktna6f6el3aw
 ```
 
 > The faucet address is `https://faucet.testnet.osmosis.zone`
