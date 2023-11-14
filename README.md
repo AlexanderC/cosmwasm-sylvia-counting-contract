@@ -100,7 +100,7 @@ junod keys add wallet-ibc --output json > .wallet.junod
 // wallet-ibc explorer: https://www.mintscan.io/juno-testnet/address/juno1hhfw77usyd6t8y9xuj6xlmqq5nkuqyc9vkcsha
 ```
 
-> Latest faucet working is `https://faucet.reece.sh/uni-6/YOUR-ADDRESS-HERE`. Probably won't work for you though...
+> Latest faucet working is `https://faucet.reece.sh/uni-6/{replace-with-your-address}` (e.g. https://faucet.reece.sh/uni-6/juno1hhfw77usyd6t8y9xuj6xlmqq5nkuqyc9vkcsha). Probably won't work for you though...
 
 > May you want to query wallet balances use `junod query bank balances juno1dkgs7ymhmnnu3c874wyaakh03jn9l3fes52jxg`
 
