@@ -100,7 +100,7 @@ junod keys add wallet-ibc --output json > .wallet.junod
 // wallet-ibc explorer: https://www.mintscan.io/juno-testnet/address/juno1hhfw77usyd6t8y9xuj6xlmqq5nkuqyc9vkcsha
 ```
 
-> Latest faucet working is `https://faucet.reece.sh/uni-6/{replace-with-your-address}` (e.g. https://faucet.reece.sh/uni-6/juno1hhfw77usyd6t8y9xuj6xlmqq5nkuqyc9vkcsha). Probably won't work for you though...
+> Latest faucet working is `https://faucet.reece.sh/uni-6/{replace-with-your-address}` (e.g. https://faucet.reece.sh/uni-6/juno1hhfw77usyd6t8y9xuj6xlmqq5nkuqyc9vkcsha).
 
 > May you want to query wallet balances use `junod query bank balances juno1dkgs7ymhmnnu3c874wyaakh03jn9l3fes52jxg`
 
@@ -138,12 +138,12 @@ Than we instantiate the contracts on both networks:
 
 ```
 // Chain A
-CODE_ID=3883
-junod tx wasm instantiate "$CODE_ID" '{"count":0,"admins":[]}' --label "counting-contract" --chain-id=uni-6 -y --from wallet --admin wallet --gas=auto --gas-adjustment=1.15 --gas-prices="0.025ujunox"
+CODE_ID_A=3883
+junod tx wasm instantiate "$CODE_ID_A" '{"count":0,"admins":[]}' --label "counting-contract" --chain-id=uni-6 -y --from wallet --admin wallet --gas=auto --gas-adjustment=1.15 --gas-prices="0.025ujunox"
 
 // Chain B
-CODE_ID=5085
-osmosisd tx wasm instantiate "$CODE_ID" '{"count":0,"admins":[]}' --label "counting-contract" --chain-id=osmo-test-5 -y --from wallet --admin wallet --gas=auto --gas-adjustment=1.15 --gas-prices="0.025uosmo"
+CODE_ID_B=5085
+osmosisd tx wasm instantiate "$CODE_ID_B" '{"count":0,"admins":[]}' --label "counting-contract" --chain-id=osmo-test-5 -y --from wallet --admin wallet --gas=auto --gas-adjustment=1.15 --gas-prices="0.025uosmo"
 ```
 
 > To get initiation info you must query the `txhash`, e.g.: `junod q tx BF1862AD34C328A30D0CE99DD684E71E015FB2E95D29D55AD603B24A7324EB14 --output=json` and `osmosisd q tx 197AC7FA66DA0E5E35EDE2F822F8DC6A54DDD5936D28B7812DC2DC7DE3A41414 --output=json`
@@ -152,12 +152,12 @@ Now we need to query the instantiated contracts:
 
 ```
 // Chain A
-CONTRANT_ADDRESS=juno1wjjx974u9j80wazvxsx3ukr85jmazk7szk37qn0kmelu98gl620qwxqxz0
-junod query wasm contract "$CONTRANT_ADDRESS"
+CONTRANT_ADDRESS_A=juno1wjjx974u9j80wazvxsx3ukr85jmazk7szk37qn0kmelu98gl620qwxqxz0
+junod query wasm contract "$CONTRANT_ADDRESS_A"
 
 // Chain B
-CONTRANT_ADDRESS=osmo1xz00vhlm7e3ysj9f2v3jtcjpqvectwgdkkxuau8rw290ys087s6qtk24hy
-osmosisd query wasm contract "$CONTRANT_ADDRESS"
+CONTRANT_ADDRESS_B=osmo1xz00vhlm7e3ysj9f2v3jtcjpqvectwgdkkxuau8rw290ys087s6qtk24hy
+osmosisd query wasm contract "$CONTRANT_ADDRESS_B"
 ```
 
 > Look at `ibc_port_id` in the output. Should the contract have IBC entry points enabled it will contain a value e.g. `wasm.juno1wjjx974u9j80wazvxsx3ukr85jmazk7szk37qn0kmelu98gl620qwxqxz0`
@@ -178,7 +178,7 @@ hermes keys add --chain osmo-test-5 --key-file .wallet.osmosis
 ```
 
 > May you want to query balances use `hermes keys balance --chain osmo-test-5`
- and `hermes keys balance --chain uni-6`
+ and `hermes keys balance --chain uni-6`. `.wallet.*` contain sensitive data— make sure you keep them in `.gitignore`!
 
 Afterwards, in order to get IBC running we need to create the relayer channel:
 
@@ -264,16 +264,13 @@ hermes start
 
 ## Interacting with contracts (Testnet)
 
-First we set contract addresses so we can use them:
-
-```
-CONTRANT_ADDRESS_A=juno1wjjx974u9j80wazvxsx3ukr85jmazk7szk37qn0kmelu98gl620qwxqxz0
-CONTRANT_ADDRESS_B=osmo1xz00vhlm7e3ysj9f2v3jtcjpqvectwgdkkxuau8rw290ys087s6qtk24hy
-```
-
 Check our counters states on both chains:
 
 ```
+// Assuming addresses were set during the steps above...
+// CONTRANT_ADDRESS_A=juno1wjjx974u9j80wazvxsx3ukr85jmazk7szk37qn0kmelu98gl620qwxqxz0
+// CONTRANT_ADDRESS_B=osmo1xz00vhlm7e3ysj9f2v3jtcjpqvectwgdkkxuau8rw290ys087s6qtk24hy
+
 junod query wasm contract-state smart "$CONTRANT_ADDRESS_A" '{"count": {}}' --chain-id=uni-6
 junod query wasm contract-state smart "$CONTRANT_ADDRESS_A" '{"ibc_count": {"channel": "channel-839"}}' --chain-id=uni-6
 
