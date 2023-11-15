@@ -1,3 +1,5 @@
+#![allow(deprecated)]
+
 use cosmwasm_std::{Response, StdError};
 use sylvia::interface;
 use sylvia::types::{ExecCtx, QueryCtx};

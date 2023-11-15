@@ -1,3 +1,5 @@
+#![allow(deprecated)]
+
 use cosmwasm_std::{ensure, Addr, Response, StdResult, Storage};
 use cw2::set_contract_version;
 use cw_storage_plus::{Item, Map};

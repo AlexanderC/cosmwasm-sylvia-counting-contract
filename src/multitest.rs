@@ -1,3 +1,5 @@
+#![allow(deprecated)]
+
 use cosmwasm_std::{Addr, to_binary, to_json_binary};
 use sylvia::multitest::App;
 
