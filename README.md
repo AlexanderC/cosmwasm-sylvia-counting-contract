@@ -31,8 +31,9 @@ To deploy and operate the contracts on Juno we need `junod` (https://docs.junone
 ```
 git clone https://github.com/CosmosContracts/juno
 cd juno
-git fetch
-git checkout v17.1.1
+git fetch --all --tags
+git checkout v18.0.0-alpha.2
+make install
 ```
 
 To deploy and operate the contracts on Osmosis we need `osmosisd` (https://docs.osmosis.zone/cosmwasm/testnet/cosmwasm-deployment#setup-osmosis-testnet):
@@ -294,6 +295,8 @@ osmosisd tx wasm execute "$CONTRANT_ADDRESS_B" '{"increment_ibc_count": {"channe
 // Now query the contract on Juno and check results
 junod query wasm contract-state smart "$CONTRANT_ADDRESS_A" '{"ibc_count": {"channel": "channel-839"}}' --chain-id=uni-6
 ```
+
+> You might do call increment vice-versa, from Juno using `junod tx wasm execute "$CONTRANT_ADDRESS_A" '{"increment_ibc_count": {"channel": "channel-839"}}' --chain-id=uni-6 --from wallet -y --gas=auto --gas-adjustment=1.3 --gas-prices="0.025ujunox" -b sync`
 
 ...now let's decrease count in Juno contract through Osmosis:
 

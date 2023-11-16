@@ -42,10 +42,10 @@ impl CounterContract<'_> {
     pub const fn new() -> Self {
         Self {
             count: Item::new("count"),
-            owner: Item::new("owner"),
-            admins: Item::new("admins"),
-            ibc_counts: Map::new("ibc_counts"),
-            ibc_timeouts: Map::new("ibc_timeouts"),
+            owner: Item::new("owner"), // Whitelist
+            admins: Item::new("admins"), // Whitelist
+            ibc_counts: Map::new("ibc_counts"), // Ibc
+            ibc_timeouts: Map::new("ibc_timeouts"), // Ibc
         }
     }
 

@@ -54,7 +54,7 @@ pub fn ibc_channel_open(
     _env: Env,
     msg: IbcChannelOpenMsg,
 ) -> Result<IbcChannelOpenResponse, ContractError> {
-    validate_order_and_version(msg.channel(), msg.counterparty_version())?;
+    validate_ibc_channel(msg.channel(), msg.counterparty_version())?;
     Ok(IbcChannelOpenResponse::default())
 }
 
@@ -64,7 +64,7 @@ pub fn ibc_channel_connect(
     _env: Env,
     msg: IbcChannelConnectMsg,
 ) -> Result<IbcBasicResponse, ContractError> {
-    validate_order_and_version(msg.channel(), msg.counterparty_version())?;
+    validate_ibc_channel(msg.channel(), msg.counterparty_version())?;
 
     // Initialize the count for this channel to zero.
     let channel = msg.channel().endpoint.channel_id.clone();
@@ -158,10 +158,18 @@ pub fn ibc_packet_timeout(
     Ok(IbcBasicResponse::new().add_attribute("method", "ibc_packet_timeout"))
 }
 
-pub fn validate_order_and_version(
+pub fn validate_ibc_channel(
     channel: &IbcChannel,
     counterparty_version: Option<&str>,
 ) -> Result<(), ContractError> {
+    // !!! IMPORTANT | ACHTUNG !!!
+    // You might want to validate counterparty first, to be sure you are
+    //      communicating with certain contract on certain chain. For that purpose use smth like:
+    //          channel.endpoint.channel_id = "x" && channel.counterparty_endpoint.port_id = "y"
+    // >>> Each channel only connects to a specific chain. 
+    //      So if you know channel-4 on your chain is for osmosis, then you can trust channel-4.
+    // NEVER use port_id standalone as it can be compromised by forking a chain...
+
     // We expect an unordered channel here. Ordered channels have the
     // property that if a message is lost the entire channel will stop
     // working until you start it again.
